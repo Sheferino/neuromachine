@@ -31,6 +31,9 @@ obj_struct=struct('type',2,'subtype',1,'xy',[0;0],'K',0,'vel',0, 'U',0,'brn_stru
 % acc --- lineinoe uskorenie
 % U --- uglovaya skorost', rad/fr
 % E --- uglovoe uskorenie
+%
+% skr --- kolichestvo ochkov
+%
 % brn_struct - struktura neiroseti. Kolichestvo neironov v kajdom sloe
 % brn --- mozg.
 
@@ -38,31 +41,31 @@ obj_struct=struct('type',2,'subtype',1,'xy',[0;0],'K',0,'vel',0, 'U',0,'brn_stru
 obj(1:kol_obj)=deal(obj_struct);
 
 %% Pervicnaya populyaciya
-
+tic;
 for num_gen=1:kol_gen
     %% Turnir
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
-    for num_obj=1:kol_obj_1        
-        obj(num_obj).type=1;     
+    for num_obj=1:kol_obj_1
+        obj(num_obj).type=1;
         obj(num_obj).xy=round([hght/2;wdth/2]);
-        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=1;    
+        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
     end;
-    for num_obj=1:kol_obj_2
+    for num_obj=num_obj:kol_obj
         obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
-        while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))==1)
+        while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
             obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
         end;
-        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=1;
+        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
     end;
     
-    %% Pokadrovyi progon    
+    %% Pokadrovyi progon
     for num_frm=1:kol_frm
         %% Opredelenie parametrov sredy i reakciya na nih
         for num_obj=1:kol_obj
             switch obj(num_obj).type
                 case 1 % nepodvijnye ob'ekty
-                    disp('сообщение');
+                    %disp('сообщение');
                     % passivnye, nikakih parametrov ne opredelyaetsya
                 case 2  % agenty, upravlyaemye neirosetyami
                     % faza ocenki obstanovki
@@ -83,17 +86,42 @@ for num_gen=1:kol_gen
                     %POTENCIAL'NO VNESTI IH V GENETICHESKII OBMEN
                     %obj(num_obj).U=tanh(obj(num_obj).U+obj(num_obj).E);
                     obj(num_obj).K=obj(num_obj).K+obj(num_obj).U;
-                    obj(num_obj).xy(1)=round(hght*tanh((obj(num_obj).xy(1)+obj(num_obj).vel*cos(obj(num_obj).K))/hght));
-                    obj(num_obj).xy(2)=round(wdth*tanh((obj(num_obj).xy(2)+obj(num_obj).vel*sin(obj(num_obj).K))/wdth));
+                    
+                    %% Peremewenie s proverkoi na stolknoveniya
+                    xy(1)=obj(num_obj).xy(1)+obj(num_obj).vel*cos(obj(num_obj).K);
+                    xy(2)=obj(num_obj).xy(2)+obj(num_obj).vel*sin(obj(num_obj).K);
+                    if norm(obj(num_obj).xy-xy')~=0 % proverka na nenulevoe peremewenie
+                        
+                        if (xy(1)<=0) %proverka na granicu territorii
+                            xy(1)=1;
+                        elseif (xy(1)>hght)
+                            xy(1)=hght;
+                        end;
+                        if (xy(2)<=0) %proverka na granicu territorii
+                            xy(2)=1;
+                        elseif (xy(2)>wdth)
+                            xy(2)=wdth;
+                        end;
+                        if pole(xy(1),xy(2))==0 %proverka na stolknovenie
+                            pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=0;
+                            obj(num_obj).xy=xy';
+                            pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
+                        else
+                            %disp(['Столкновение ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
+                            % obj ne peremewaetsya
+                        end;
+                    else
+                        %disp('н');
+                    end;
                     
                     %faza ocenivaniya rezultatov dvijeniya
                     
-            end;            
-        end;      
+            end;
+        end;
         %disp(obj(3).xy);
         
-    end;    
-    
+    end;
+    toc;
     %% Formirovanie turnirnoi tablicy
     
     %% Skrewivanie
