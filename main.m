@@ -2,7 +2,7 @@
 % Opisanie programmy
 % opisanie peremennyh
 % Bazovye peremennye:
-kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
+kol_obj_1=10; %kolichestvo ob'ektov 1 tipa
 kol_obj_2=100; %kolichestvo ob'ektov vtorogo tipa
 kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 nn_struct=[2 2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
@@ -70,11 +70,9 @@ for num_gen=1:kol_gen
                 case 2  % agenty, upravlyaemye neirosetyami
                     % faza ocenki obstanovki
                     vct_targets=[obj([obj.type]==1).xy];
-                    [mtr_targets] = targets(1, vct_targets, obj(num_obj).xy,10);
-                    for k=1:size(vct_targets,2)
-                        vct_targets(:,k)=vct_targets(:,k)-obj(num_obj).xy;
-                    end;
-                    az_target=atan2(vct_targets(1,:),vct_targets(2,:));% napravleniya na celi
+                    [targets_index targets_dist targets_azmt] = targets(find([obj.type]==1), vct_targets, obj(num_obj).xy,1);
+                    
+                    az_target=targets_azmt;% napravleniya na celi
                     
                     % faza upravleniya
                     vct_vh=[az_target obj(num_obj).K ];
