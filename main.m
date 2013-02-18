@@ -19,12 +19,11 @@ nn_length=sum(nn_struct(2:end))+nn_struct(1:(end-1))*nn_struct(2:end)'; % dlina 
 % "obj" - eto vse ob'ekty turnirnogo polya
 
 % sozdanie i opisanie structury "obj"
-obj_struct=struct('type',2,'subtype',1,'xy',[0;0],'K',0,'vel',0, 'U',0,'brn_struct',nn_struct,'brn',rand(1,nn_length));
+obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',0,'acc',0,'U',0,'E',0,'skr',0,'brn_struct',nn_struct,'brn',rand(1,nn_length));
 % type --- tip   
-%   1-mertvye, nepodvijnye
-%   2-jivye, upravlyautsya neiroset'u
+%   1-celi
+%   2-upravlyautsya neiroset'u agenty
 %
-% subtype --- podtip, dlya raznyh raznovidnostei
 % XY --- koordinaty, pix
 % K --- azimuth, rad
 % vel --- lineinaya skorost', pix/fr
@@ -51,7 +50,8 @@ for num_gen=1:kol_gen
         obj(num_obj).xy=round([hght/2;wdth/2]);
         pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
     end;
-    for num_obj=num_obj:kol_obj
+    for num_obj=(num_obj+1):kol_obj
+        obj(num_obj).type=2;
         obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
         while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
             obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
@@ -70,6 +70,7 @@ for num_gen=1:kol_gen
                 case 2  % agenty, upravlyaemye neirosetyami
                     % faza ocenki obstanovki
                     vct_targets=[obj([obj.type]==1).xy];
+                    [mtr_targets] = targets(1, vct_targets, obj(num_obj).xy,10);
                     for k=1:size(vct_targets,2)
                         vct_targets(:,k)=vct_targets(:,k)-obj(num_obj).xy;
                     end;
