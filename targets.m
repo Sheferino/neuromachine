@@ -1,11 +1,18 @@
 function [targets_index targets_dist targets_azmt] = targets(targets_ind, targets_xy, obj_xy,kol_targets )
 % DESCRIPTION
-%
+% Vozvrawaet parametry celei
 % SYNTAX
-%
+% [targets_index targets_dist targets_azmt] = targets(targets_ind, targets_xy, obj_xy,kol_targets )
 % INPUT
-% 
+% targets_ind - indeksy celei
+% targets_xy - ih koordinaty
+% obj_xy - koordinaty ob'ekta
+% kol_targets - kolichestvo vidimyh celei (po udaleniu)
 % OUTPUT
+% targets_index - indeksy celei v poryadke udaleniya
+% targets_dist - rasstoyaniya do nih
+% targets_azmt - azimut na celi
+
 targets_kol=size(targets_xy,2);
 mtr_targets=zeros(targets_kol,3);
 for k=1:targets_kol
