@@ -6,8 +6,8 @@ clear all; home;
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
 kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
 
-nn_struct=[2 2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=10; %kolichestvo pokolenii
+nn_struct=[2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
+kol_gen=50; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
@@ -45,7 +45,7 @@ obj(1:kol_obj)=deal(obj_struct);
 %% Pervicnaya populyaciya
 tic;
 for num_gen=1:kol_gen
-    disp(['Поколение ' num2str(num_gen)]);
+    disp(['Pokolenie ' num2str(num_gen)]);
     %% Turnir
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
@@ -100,21 +100,21 @@ for num_gen=1:kol_gen
                     if norm(obj(num_obj).xy-xy')~=0 % proverka na nenulevoe peremewenie
                         
                         if (xy(1)<=0) %proverka na granicu territorii
-                            xy(1)=1;
+                            xy(1)=xy(1)+hght;
                         elseif (xy(1)>hght)
-                            xy(1)=hght;
+                            xy(1)=xy(1)-hght;
                         end;
                         if (xy(2)<=0) %proverka na granicu territorii
-                            xy(2)=1;
+                            xy(2)=xy(2)+wdth;
                         elseif (xy(2)>wdth)
-                            xy(2)=wdth;
+                            xy(2)=xy(2)-wdth;
                         end;
                         if pole(xy(1),xy(2))==0 %proverka na stolknovenie
                             pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=0;
                             obj(num_obj).xy=xy';
                             pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
                         else
-                            disp(['Столкновение ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
+                            disp(['Stolknovenie ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
                             % obj ne peremewaetsya
                         end;
                     end;
@@ -124,7 +124,7 @@ for num_gen=1:kol_gen
                     vct_im_targets=targets_ind(targets_dist_post<5);
                     if isempty(vct_im_targets)
                     else
-                        disp(['Попадание ' num2str(num_obj)]);
+                        disp(['Popadanie ' num2str(num_obj)]);
                         %obj(num_obj).scr=obj(num_obj).scr+100;
                     end;
                     if targets_dist_post(1)<targets_dist_pre(1)
