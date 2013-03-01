@@ -17,7 +17,7 @@ targets_kol=size(targets_xy,2);
 mtr_targets=zeros(targets_kol,3);
 for k=1:targets_kol
     vctr_target=targets_xy(:,k)-obj_xy;
-    mtr_targets(k,:)=[targets_ind(k) norm(vctr_target) atan2(vctr_target(1),vctr_target(2))];
+    mtr_targets(k,:)=[targets_ind(k) norm(vctr_target) -atan2(vctr_target(2),vctr_target(1))];
 end
 
 [~,ind]=sort(mtr_targets(:,2));

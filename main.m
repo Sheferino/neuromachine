@@ -4,11 +4,11 @@ clear all; home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=50; %kolichestvo pokolenii
-kol_survived_2=round(kol_obj_2*0.25);
+kol_gen=20; %kolichestvo pokolenii
+kol_survived_2=round(kol_obj_2*0.5);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
 hght=200;% vysota igrivigi polya
@@ -22,7 +22,7 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 % "obj" - eto vse ob'ekty turnirnogo polya
 
 % sozdanie i opisanie structury "obj"
-obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',1,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',rand(1,nn_length));
+obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',zeros(1,nn_length));
 % type --- tip   
 %   1-celi
 %   2-upravlyautsya neiroset'u agenty
@@ -41,6 +41,16 @@ obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',1,'acc',0,'U',0,'E',0,'scr',0,
 
 %sozdanie massiva ob'ektov
 obj(1:kol_obj)=deal(obj_struct);
+for num_obj=1:kol_obj_1
+    obj(num_obj).type=1;
+    %obj(num_obj).brn=rand(1,nn_length);
+end;
+for num_obj=(num_obj+1):kol_obj
+    obj(num_obj).type=2;
+    obj(num_obj).brn=rand(1,nn_length);
+end;
+% obj(30).brn=[1 -1 0];
+% obj(31).brn=[1 -1 0];
 
 %% Pervicnaya populyaciya
 tic;
@@ -50,7 +60,6 @@ for num_gen=1:kol_gen
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
     for num_obj=1:kol_obj_1
-        obj(num_obj).type=1;
         obj(num_obj).scr=0;
         obj(num_obj).xy=round([hght/2;wdth/2]);% tochno po centru. Kostyl'
         while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
@@ -59,7 +68,6 @@ for num_gen=1:kol_gen
         pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
     end;
     for num_obj=(num_obj+1):kol_obj
-        obj(num_obj).type=2;
         obj(num_obj).scr=0;
         obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
         while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
@@ -96,7 +104,7 @@ for num_gen=1:kol_gen
                     
                     %% Peremewenie s proverkoi na stolknoveniya
                     xy(1)=round(obj(num_obj).xy(1)+obj(num_obj).vel*cos(obj(num_obj).K));
-                    xy(2)=round(obj(num_obj).xy(2)+obj(num_obj).vel*sin(obj(num_obj).K));
+                    xy(2)=round(obj(num_obj).xy(2)+obj(num_obj).vel*sin(-obj(num_obj).K));
                     if norm(obj(num_obj).xy-xy')~=0 % proverka na nenulevoe peremewenie
                         
                         if (xy(1)<=0) %proverka na granicu territorii
@@ -114,7 +122,7 @@ for num_gen=1:kol_gen
                             obj(num_obj).xy=xy';
                             pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
                         else
-                            disp(['Stolknovenie ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
+                            %disp(['Stolknovenie ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
                             % obj ne peremewaetsya
                         end;
                     end;
@@ -127,9 +135,9 @@ for num_gen=1:kol_gen
                         disp(['Popadanie ' num2str(num_obj)]);
                         %obj(num_obj).scr=obj(num_obj).scr+100;
                     end;
-                    if targets_dist_post(1)<targets_dist_pre(1)
-                        obj(num_obj).scr=obj(num_obj).scr+1;
-                    end;
+                   % if targets_dist_post(1)<targets_dist_pre(1)
+                        obj(num_obj).scr=obj(num_obj).scr+(targets_dist_pre(1)-targets_dist_post(1));
+                   % end;
                     
                     
             end;
@@ -142,14 +150,16 @@ for num_gen=1:kol_gen
     obj_survived=obj(ind_survived);
     
     %% Skrewivanie
-    for i=1:2:kol_survived_2
-        for k=(round(kol_obj_2/kol_survived_2)*(i-1)+1):round(kol_obj_2/kol_survived_2)*(i)
-            for m=1:length(obj(k).brn)
-                obj(k).brn(m)=obj_survived(i+round(rand())).brn(m)+0.01*(rand()-0.5);
-            end;
-        end;
+    m=1;
+    for k=(kol_obj_1+1):kol_obj
+        obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
+        m=m+(kol_survived_2/kol_obj_2)/2;
     end;
-    
-    
-    %% Mutacia
+    %     k=kol_obj_1+1;
+    %     for i=1:2:kol_survived_2
+%         for k=(k+1):(round(kol_obj_2/kol_survived_2)*(i)+kol_obj_1)%(round(kol_obj_2/kol_survived_2)*(i-1)+1+kol_obj_1):(round(kol_obj_2/kol_survived_2)*(i)+kol_obj_1)
+%             obj(k).brn=crossing(obj_survived(i).brn,obj_survived(i+1).brn); 
+%             disp(k);
+%         end;
+%     end;
 end;
