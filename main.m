@@ -4,14 +4,14 @@ clear all; home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=20; %kolichestvo pokolenii
+kol_gen=10; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.5);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
-hght=200;% vysota igrivigi polya
+hght=200;% vysota igrovogo polya
 wdth=400;% shirina igrovogo polya
 
 % Bazovye raschetnye peremennye:
@@ -21,7 +21,7 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 %% Sozdanie ob'ekt "obj" so strukturoi obj_struct
 % "obj" - eto vse ob'ekty turnirnogo polya
 
-% sozdanie i opisanie structury "obj"
+% sozdanie i opisanie struktury "obj"
 obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',zeros(1,nn_length));
 % type --- tip   
 %   1-celi
@@ -47,7 +47,7 @@ for num_obj=1:kol_obj_1
 end;
 for num_obj=(num_obj+1):kol_obj
     obj(num_obj).type=2;
-    obj(num_obj).brn=rand(1,nn_length);
+    obj(num_obj).brn=2*(rand(1,nn_length)-0.5);
 end;
 % obj(30).brn=[1 -1 0];
 % obj(31).brn=[1 -1 0];
