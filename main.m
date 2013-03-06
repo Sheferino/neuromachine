@@ -4,16 +4,17 @@ clear all; home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=160; %kolichestvo ob'ektov vtorogo tipa
 
-nn_struct=[2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=10; %kolichestvo pokolenii
-kol_survived_2=round(kol_obj_2*0.5);
-kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
+nn_struct=[2 2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
+kol_gen=80; %kolichestvo pokolenii
+kol_survived_2=round(kol_obj_2*0.25);
+kol_frm=80; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
 hght=200;% vysota igrovogo polya
 wdth=400;% shirina igrovogo polya
 
+str_logcat='log/';
 % Bazovye raschetnye peremennye:
 nn_length=sum(nn_struct(2:end))+nn_struct(1:(end-1))*nn_struct(2:end)'; % dlina vektora s koefficientami nn.
 kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
@@ -47,7 +48,7 @@ for num_obj=1:kol_obj_1
 end;
 for num_obj=(num_obj+1):kol_obj
     obj(num_obj).type=2;
-    obj(num_obj).brn=2*(rand(1,nn_length)-0.5);
+    obj(num_obj).brn=2*(rand(1,nn_length,'single')-0.5);
 end;
 % obj(30).brn=[1 -1 0];
 % obj(31).brn=[1 -1 0];
@@ -57,6 +58,8 @@ tic;
 for num_gen=1:kol_gen
     disp(['Pokolenie ' num2str(num_gen)]);
     %% Turnir
+    fl_turnirlog=fopen([str_logcat num2str(num_gen,'%3.0u') '_genlog.bn'],'w');
+    
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
     for num_obj=1:kol_obj_1
@@ -78,6 +81,7 @@ for num_gen=1:kol_gen
     
     %% Pokadrovyi progon
     for num_frm=1:kol_frm
+        fwrite(fl_turnirlog,pole,'uint8');
         %% Opredelenie parametrov sredy i reakciya na nih
         for num_obj=1:kol_obj
             switch obj(num_obj).type
@@ -132,7 +136,7 @@ for num_gen=1:kol_gen
                     vct_im_targets=targets_ind(targets_dist_post<5);
                     if isempty(vct_im_targets)
                     else
-                        disp(['Popadanie ' num2str(num_obj)]);
+                        %disp(['Popadanie ' num2str(num_obj)]);
                         %obj(num_obj).scr=obj(num_obj).scr+100;
                     end;
                    % if targets_dist_post(1)<targets_dist_pre(1)
@@ -155,11 +159,5 @@ for num_gen=1:kol_gen
         obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
         m=m+(kol_survived_2/kol_obj_2)/2;
     end;
-    %     k=kol_obj_1+1;
-    %     for i=1:2:kol_survived_2
-%         for k=(k+1):(round(kol_obj_2/kol_survived_2)*(i)+kol_obj_1)%(round(kol_obj_2/kol_survived_2)*(i-1)+1+kol_obj_1):(round(kol_obj_2/kol_survived_2)*(i)+kol_obj_1)
-%             obj(k).brn=crossing(obj_survived(i).brn,obj_survived(i+1).brn); 
-%             disp(k);
-%         end;
-%     end;
+    fclose(fl_turnirlog);
 end;
