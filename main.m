@@ -4,10 +4,10 @@ clear all; home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=160; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2 2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=80; %kolichestvo pokolenii
+kol_gen=40; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
 kol_frm=80; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
@@ -86,7 +86,7 @@ for num_gen=1:kol_gen
         for num_obj=1:kol_obj
             switch obj(num_obj).type
                 case 1 % nepodvijnye ob'ekty
-                    %disp('сообщение');
+
                     % passivnye, nikakih parametrov ne opredelyaetsya
                 case 2  % agenty, upravlyaemye neirosetyami
                     % faza ocenki obstanovki
@@ -139,13 +139,11 @@ for num_gen=1:kol_gen
                         %disp(['Popadanie ' num2str(num_obj)]);
                         %obj(num_obj).scr=obj(num_obj).scr+100;
                     end;
-                   % if targets_dist_post(1)<targets_dist_pre(1)
-                        obj(num_obj).scr=obj(num_obj).scr+(targets_dist_pre(1)-targets_dist_post(1));
-                   % end;
                     
+                    obj(num_obj).scr=obj(num_obj).scr+(targets_dist_pre(1)-targets_dist_post(1));
                     
             end;
-        end;        
+        end;
     end;
     toc;
     %% Formirovanie turnirnoi tablicy

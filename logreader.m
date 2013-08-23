@@ -1,4 +1,4 @@
-fid=fopen('log/20_genlog.bn','r');
+fid=fopen('log/40_genlog.bn','r');
 k=1;
 figure('Renderer','zbuffer');
 imagesc(rand(200,400));
