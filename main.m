@@ -6,10 +6,10 @@ clear all; home;
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
 kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
-nn_struct=[2 2 1]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=40; %kolichestvo pokolenii
+nn_struct=[2 2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
+kol_gen=60; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
-kol_frm=80; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
+kol_frm=40; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
 hght=200;% vysota igrovogo polya
 wdth=400;% shirina igrovogo polya
@@ -23,7 +23,7 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 % "obj" - eto vse ob'ekty turnirnogo polya
 
 % sozdanie i opisanie struktury "obj"
-obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',zeros(1,nn_length));
+obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
 % type --- tip   
 %   1-celi
 %   2-upravlyautsya neiroset'u agenty
@@ -48,7 +48,7 @@ for num_obj=1:kol_obj_1
 end;
 for num_obj=(num_obj+1):kol_obj
     obj(num_obj).type=2;
-    obj(num_obj).brn=2*(rand(1,nn_length,'single')-0.5);
+    %obj(num_obj).brn=2*(rand(1,nn_length,'single')-0.5);    
 end;
 % obj(30).brn=[1 -1 0];
 % obj(31).brn=[1 -1 0];
@@ -91,13 +91,13 @@ for num_gen=1:kol_gen
                 case 2  % agenty, upravlyaemye neirosetyami
                     % faza ocenki obstanovki
                     [~, targets_dist_pre, targets_azmt] = targets(find([obj.type]==1),[obj([obj.type]==1).xy], obj(num_obj).xy,1);
-                    
                     % targets_azmt - napravleniya na celi
                     
                     % faza upravleniya
-                    vct_vh=[targets_azmt obj(num_obj).K ];
-                    vct_vyh=fc_nn(obj(num_obj).brn_struct,obj(num_obj).brn,vct_vh);
-                    obj(num_obj).U=vct_vyh(1);
+                    %                     vct_vh=[targets_azmt obj(num_obj).K ];
+                    %                     vct_vyh=fc_nn(obj(num_obj).brn_struct,obj(num_obj).brn,vct_vh);
+                    %                     obj(num_obj).U=vct_vyh(1);
+                    [obj(num_obj).brn,obj(num_obj).U]=fc_nn(obj(num_obj).brn_struct,obj(num_obj).brn,targets_azmt,obj(num_obj).K);
                     
                     % faza dvijeniya
                     %obj(num_obj).V=tanh(obj(num_obj).V+obj(num_obj).koef_usk*obj(num_obj).acc);
