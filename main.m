@@ -167,9 +167,6 @@ for num_gen=1:kol_gen
     %% Skrewivanie
     m=1;
     for k=(kol_obj_1+1):kol_obj
-        if numel(obj_survived(2*floor(m)).brn)==0
-            pause
-        end;
         obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
         m=m+(kol_survived_2/kol_obj_2)/2;
     end;
