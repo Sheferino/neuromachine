@@ -6,10 +6,10 @@ clear all; home;
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
 kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
-nn_struct=[2 2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=60; %kolichestvo pokolenii
+nn_struct=[2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
+kol_gen=20; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
-kol_frm=40; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
+kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
 hght=200;% vysota igrovogo polya
 wdth=400;% shirina igrovogo polya
@@ -23,13 +23,13 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 % "obj" - eto vse ob'ekty turnirnogo polya
 
 % sozdanie i opisanie struktury "obj"
-obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
+obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',2,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
 % type --- tip   
 %   1-celi
 %   2-upravlyautsya neiroset'u agenty
 %
 % XY --- koordinaty, pix
-% K --- azimuth, rad
+% K --- azimuth kursa, rad
 % vel --- lineinaya skorost', pix/fr
 % acc --- lineinoe uskorenie
 % U --- uglovaya skorost', rad/fr
@@ -44,14 +44,11 @@ obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',3,'acc',0,'U',0,'E',0,'scr',0,
 obj(1:kol_obj)=deal(obj_struct);
 for num_obj=1:kol_obj_1
     obj(num_obj).type=1;
-    %obj(num_obj).brn=rand(1,nn_length);
 end;
 for num_obj=(num_obj+1):kol_obj
     obj(num_obj).type=2;
-    %obj(num_obj).brn=2*(rand(1,nn_length,'single')-0.5);    
 end;
-% obj(30).brn=[1 -1 0];
-% obj(31).brn=[1 -1 0];
+
 
 %% Pervicnaya populyaciya
 tic;
@@ -63,10 +60,10 @@ for num_gen=1:kol_gen
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
     for num_obj=1:kol_obj_1
-        obj(num_obj).scr=0;
-        obj(num_obj).xy=round([hght/2;wdth/2]);% tochno po centru. Kostyl'
+        obj(num_obj).scr=nan;
+        obj(num_obj).xy=[randi(hght);randi(wdth)];%sluchainaya tochka
         while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
-            obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
+            obj(num_obj).xy=[randi(hght);randi(wdth)];
         end;
         pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
     end;
@@ -99,48 +96,64 @@ for num_gen=1:kol_gen
                     %                     obj(num_obj).U=vct_vyh(1);
                     [obj(num_obj).brn,obj(num_obj).U]=fc_nn(obj(num_obj).brn_struct,obj(num_obj).brn,targets_azmt,obj(num_obj).K);
                     
-                    % faza dvijeniya
+                    %% Faza upravleniya
                     %obj(num_obj).V=tanh(obj(num_obj).V+obj(num_obj).koef_usk*obj(num_obj).acc);
                     % VVESTI KOEFFICIENTY DEISTVIYA USKORENII I SKOROSTEI,
                     %POTENCIAL'NO VNESTI IH V GENETICHESKII OBMEN
                     %obj(num_obj).U=tanh(obj(num_obj).U+obj(num_obj).E);
                     obj(num_obj).K=obj(num_obj).K+obj(num_obj).U;
                     
-                    %% Peremewenie s proverkoi na stolknoveniya
+                    %% Faza dvijeniya
+                    % Peremewenie s proverkoi na stolknoveniya
                     xy(1)=round(obj(num_obj).xy(1)+obj(num_obj).vel*cos(obj(num_obj).K));
                     xy(2)=round(obj(num_obj).xy(2)+obj(num_obj).vel*sin(-obj(num_obj).K));
                     if norm(obj(num_obj).xy-xy')~=0 % proverka na nenulevoe peremewenie
                         
-                        if (xy(1)<=0) %proverka na granicu territorii
-                            xy(1)=xy(1)+hght;
+                       %proverka na granicu territorii
+                       %resheno otkazat'sya ot beskonechnogo polya
+                        if (xy(1)<=0)                            
+                            %xy(1)=xy(1)+hght;
+                            xy(1)=1;
                         elseif (xy(1)>hght)
-                            xy(1)=xy(1)-hght;
+                            %xy(1)=xy(1)-hght;
+                            xy(1)=hght;
                         end;
-                        if (xy(2)<=0) %proverka na granicu territorii
-                            xy(2)=xy(2)+wdth;
+                        if (xy(2)<=0)
+                            %xy(2)=xy(2)+wdth;
+                            xy(2)=1;
                         elseif (xy(2)>wdth)
-                            xy(2)=xy(2)-wdth;
+                            %xy(2)=xy(2)-wdth;
+                            xy(2)=wdth;
                         end;
                         if pole(xy(1),xy(2))==0 %proverka na stolknovenie
                             pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=0;
                             obj(num_obj).xy=xy';
                             pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
                         else
-                            %disp(['Stolknovenie ' num2str(num_obj) ' ' num2str(pole(xy(1),xy(2)))]);
+                            
                             % obj ne peremewaetsya
                         end;
                     end;
                     
-                    %faza ocenivaniya rezultatov dvijeniya
+                    %% Faza ocenivaniya rezultatov dvijeniya
                     [targets_ind, targets_dist_post,~] = targets(find([obj.type]==1), [obj([obj.type]==1).xy], obj(num_obj).xy,1);
-                    vct_im_targets=targets_ind(targets_dist_post<5);
-                    if isempty(vct_im_targets)
-                    else
+                    
+                    %iwem popadaniya
+                    target_defeated=targets_ind(targets_dist_post<5);
+                    if ~isempty(target_defeated)
+                        target_defeated=target_defeated(1);%obrabatyvaem tol'ko odno popadanie
                         %disp(['Popadanie ' num2str(num_obj)]);
-                        %obj(num_obj).scr=obj(num_obj).scr+100;
+                        obj(num_obj).scr=obj(num_obj).scr+100; %nagrada za popadanie
+                        %peremewenie celi
+                        pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))=0;
+                        obj(target_defeated).xy=[randi(hght);randi(wdth)];%sluchainaya tochka
+                        while (pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))~=0)
+                            obj(target_defeated).xy=[randi(hght);randi(wdth)];
+                        end;
+                        pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))=target_defeated;                        
                     end;
                     
-                    obj(num_obj).scr=obj(num_obj).scr+(targets_dist_pre(1)-targets_dist_post(1));
+                    obj(num_obj).scr=obj(num_obj).scr+1-2^(-(targets_dist_pre(1)-targets_dist_post(1)));
                     
             end;
         end;
@@ -154,6 +167,9 @@ for num_gen=1:kol_gen
     %% Skrewivanie
     m=1;
     for k=(kol_obj_1+1):kol_obj
+        if numel(obj_survived(2*floor(m)).brn)==0
+            pause
+        end;
         obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
         m=m+(kol_survived_2/kol_obj_2)/2;
     end;

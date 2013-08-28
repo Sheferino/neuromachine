@@ -3,6 +3,10 @@ function [ vct_out ] = crossing( vct_in_1,vct_in_2)
 
 
 vct_out=zeros(1,length(vct_in_1));
+if numel(vct_in_2)==0
+    pause;
+    
+end
 %Skrewivanie
 for k=1:length(vct_in_1)
     if rand()>0.5
