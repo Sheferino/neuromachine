@@ -1,4 +1,4 @@
-clear all; home;
+clear all; %home;
 %% NEUROMACHINE 
 % Opisanie programmy
 % opisanie peremennyh
@@ -7,12 +7,12 @@ kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
 kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=20; %kolichestvo pokolenii
+kol_gen=10; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
-hght=200;% vysota igrovogo polya
-wdth=400;% shirina igrovogo polya
+hght=800;% vysota igrovogo polya
+wdth=800;% shirina igrovogo polya
 
 str_logcat='log/';
 % Bazovye raschetnye peremennye:
@@ -23,7 +23,7 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 % "obj" - eto vse ob'ekty turnirnogo polya
 
 % sozdanie i opisanie struktury "obj"
-obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',2,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
+obj_struct=struct('num',0,'type',1,'xy',[0;0],'K',0,'vel',2,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
 % type --- tip   
 %   1-celi
 %   2-upravlyautsya neiroset'u agenty
@@ -44,41 +44,41 @@ obj_struct=struct('type',1,'xy',[0;0],'K',0,'vel',2,'acc',0,'U',0,'E',0,'scr',0,
 obj(1:kol_obj)=deal(obj_struct);
 for num_obj=1:kol_obj_1
     obj(num_obj).type=1;
+    obj(num_obj).num=num_obj;
 end;
 for num_obj=(num_obj+1):kol_obj
     obj(num_obj).type=2;
+    obj(num_obj).num=num_obj;
 end;
 
 
-%% Pervicnaya populyaciya
+
 tic;
 for num_gen=1:kol_gen
     disp(['Pokolenie ' num2str(num_gen)]);
     %% Turnir
-    fl_turnirlog=fopen([str_logcat num2str(num_gen,'%3.0u') '_genlog.bn'],'w');
+   
+    
     
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
     for num_obj=1:kol_obj_1
-        obj(num_obj).scr=nan;
-        obj(num_obj).xy=[randi(hght);randi(wdth)];%sluchainaya tochka
-        while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
-            obj(num_obj).xy=[randi(hght);randi(wdth)];
-        end;
-        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
+        obj(num_obj).scr=nan; %kostyl'!================
+        [obj(num_obj), pole] = place_obj(obj(num_obj), pole);
     end;
     for num_obj=(num_obj+1):kol_obj
         obj(num_obj).scr=0;
-        obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
-        while (pole(obj(num_obj).xy(1),obj(num_obj).xy(2))~=0)
-            obj(num_obj).xy=round([1;1]+[hght-1;wdth-1].*rand(2,1));
-        end;
-        pole(obj(num_obj).xy(1),obj(num_obj).xy(2))=num_obj;
+        [obj(num_obj), pole] = place_obj(obj(num_obj), pole);
     end;
-    
+    %zapis' v log
+     fl_turnirlog=fopen([str_logcat num2str(num_gen,'%3.0u') '_genlog.bn'],'w');
+     fwrite(fl_turnirlog,size(pole),'uint8');
+     
     %% Pokadrovyi progon
     for num_frm=1:kol_frm
+        %pole=full(pole);
         fwrite(fl_turnirlog,pole,'uint8');
+        %pole=sparse(pole);
         %% Opredelenie parametrov sredy i reakciya na nih
         for num_obj=1:kol_obj
             switch obj(num_obj).type
@@ -139,20 +139,15 @@ for num_gen=1:kol_gen
                     [targets_ind, targets_dist_post,~] = targets(find([obj.type]==1), [obj([obj.type]==1).xy], obj(num_obj).xy,1);
                     
                     %iwem popadaniya
-                    target_defeated=targets_ind(targets_dist_post<5);
+                    target_defeated=targets_ind(targets_dist_post<=3);
                     if ~isempty(target_defeated)
                         target_defeated=target_defeated(1);%obrabatyvaem tol'ko odno popadanie
-                        %disp(['Popadanie ' num2str(num_obj)]);
                         obj(num_obj).scr=obj(num_obj).scr+100; %nagrada za popadanie
                         %peremewenie celi
                         pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))=0;
-                        obj(target_defeated).xy=[randi(hght);randi(wdth)];%sluchainaya tochka
-                        while (pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))~=0)
-                            obj(target_defeated).xy=[randi(hght);randi(wdth)];
-                        end;
-                        pole(obj(target_defeated).xy(1),obj(target_defeated).xy(2))=target_defeated;                        
+                        [obj(target_defeated), pole] = place_obj(obj(target_defeated), pole);
                     end;
-                    
+                    %nelineinoe nachislenie ochkov
                     obj(num_obj).scr=obj(num_obj).scr+1-2^(-(targets_dist_pre(1)-targets_dist_post(1)));
                     
             end;

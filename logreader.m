@@ -1,20 +1,38 @@
-fid=fopen('log/20_genlog.bn','r');
-k=1;
-figure('Renderer','zbuffer');
-imagesc(rand(200,400));
+%% Chtenie logov
+% Vizualizaciya i formirovanie video
+
+%podgotovka classa video
+vidObj = VideoWriter('neuromachine.avi');
+open(vidObj);
+
+%otkrytie logov i chtenie slujebnoi informacii
+fid=fopen('log/10_genlog.bn','r');
+pole_size=fread(fid,[1 2]);
+height=pole_size(1);
+width=pole_size(2);
+
+%podgotovka grafiki
+figure('MenuBar','none','Resize','off','Position',[50 50 width height]);
+axes('NextPlot','replaceChildren','ActivePositionProperty','position','Units','pixels','Position',[0 0 width height]);
+%imagesc(rand(1000,1000));
 clmap=[0  0 0; 1 1 1; 1 0 0];
 colormap(clmap);
-axis tight;
-set(gca,'NextPlot','replaceChildren');
+%axis tight;
+
+
+k=1;
 while ~feof(fid)
-    pl=fread(fid,size(pole));
-    imagesc(pl,[0.5 1.5]);    
+    pl=sparse(fread(fid,[height width]));
+    h=imagesc(pl,[0.5 1.5]); 
+    %inspect(h);
     F(k) = getframe;
+    writeVideo(vidObj,F(k));
     title(num2str(k));
     k=k+1;
 end;
 fclose(fid);
-movie(F,10)
+close(vidObj);
+%movie(gcf,F,10)
 
 % Z = peaks;
 % figure('Renderer','zbuffer');
