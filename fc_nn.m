@@ -13,7 +13,6 @@ function [nn_vect_out,varargout]=fc_nn(nn_struct,nn_vect,varargin)
 % nepustoi.
 % output_param - vyhodnye velichiny, comma-separated
 
-
 %% Generaciya novoi neiroseti
 % Zapuskaetsya tolko esli vhodnaya neiroset' pusta
 nn_struct_full=[(nargin-2) nn_struct (nargout-1)]; %polnaya struktura neiroseti s uchetom vhodnogo i vyhodnogo sloya

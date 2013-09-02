@@ -4,7 +4,7 @@ clear all; %home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
 kol_gen=10; %kolichestvo pokolenii
@@ -72,7 +72,7 @@ for num_gen=1:kol_gen
     end;
     %zapis' v log
      fl_turnirlog=fopen([str_logcat num2str(num_gen,'%3.0u') '_genlog.bn'],'w');
-     fwrite(fl_turnirlog,size(pole),'uint8');
+     fwrite(fl_turnirlog,size(pole),'uint16');
      
     %% Pokadrovyi progon
     for num_frm=1:kol_frm
