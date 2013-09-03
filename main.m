@@ -4,15 +4,15 @@ clear all; %home;
 % opisanie peremennyh
 % Bazovye peremennye:
 kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
-kol_obj_2=40; %kolichestvo ob'ektov vtorogo tipa
+kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
-kol_gen=10; %kolichestvo pokolenii
+kol_gen=40; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
-hght=800;% vysota igrovogo polya
-wdth=800;% shirina igrovogo polya
+hght=400;% vysota igrovogo polya
+wdth=400;% shirina igrovogo polya
 
 str_logcat='log/';
 % Bazovye raschetnye peremennye:
@@ -63,7 +63,7 @@ for num_gen=1:kol_gen
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
     for num_obj=1:kol_obj_1
-        obj(num_obj).scr=nan; %kostyl'!================
+        obj(num_obj).scr=0;
         [obj(num_obj), pole] = place_obj(obj(num_obj), pole);
     end;
     for num_obj=(num_obj+1):kol_obj
@@ -155,15 +155,15 @@ for num_gen=1:kol_gen
     end;
     toc;
     %% Formirovanie turnirnoi tablicy
-    [~,ind_survived]=sort([obj.scr],'descend');
-    ind_survived=ind_survived(1:kol_survived_2);
-    obj_survived=obj(ind_survived);
+    obj_survived=TournamentTable(obj([obj.type]==2), kol_survived_2);
     
     %% Skrewivanie
-    m=1;
-    for k=(kol_obj_1+1):kol_obj
-        obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
-        m=m+(kol_survived_2/kol_obj_2)/2;
-    end;
-    fclose(fl_turnirlog);
+    [obj] = procreation(obj,obj_survived);
+   
+%     m=1;
+%     for k=(kol_obj_1+1):kol_obj
+%         obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
+%         m=m+(kol_survived_2/kol_obj_2)/2;
+%     end;
+%     fclose(fl_turnirlog);
 end;

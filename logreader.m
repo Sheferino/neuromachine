@@ -6,7 +6,7 @@ vidObj = VideoWriter('neuromachine.avi','Uncompressed AVI');
 open(vidObj);
 
 %otkrytie logov i chtenie slujebnoi informacii
-fid=fopen('log/10_genlog.bn','r');
+fid=fopen('log/40_genlog.bn','r');
 pole_size=fread(fid,[1 2],'uint16');
 height=pole_size(1);
 width=pole_size(2);
