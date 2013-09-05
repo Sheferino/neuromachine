@@ -6,8 +6,9 @@ vidObj = VideoWriter('neuromachine.avi','Uncompressed AVI');
 open(vidObj);
 
 %otkrytie logov i chtenie slujebnoi informacii
-fid=fopen('log/40_genlog.bn','r');
+fid=fopen('log/10_genlog.bn','r');
 pole_size=fread(fid,[1 2],'uint16');
+kol_obj_1=fread(fid,1,'uint16');
 height=pole_size(1);
 width=pole_size(2);
 
@@ -20,7 +21,7 @@ colormap(clmap);
 k=1;
 while ~feof(fid)
     pl=sparse(fread(fid,[height width],'uint8'));
-    h=imagesc(pl,[0.5 1.5]);
+    h=imagesc(pl,[0.5 (kol_obj_1+0.5)]);
     F(k) = getframe; %zahvat kadra
     writeVideo(vidObj,F(k));
     title(num2str(k));

@@ -2,11 +2,12 @@ function [ objects ] = procreation(objects,parents )
 %  DESCRIPTION
 % Vozvrawaet rezul'tat skrewivaniya i mutacii.
 %  SYNTAX
-% [ children ] = procreation( parents,kol_children )
+% [ objects ] = procreation(objects,parents )
 %  INPUT
-% 
+% objects - ves' massiv ob'ektov
+% parents - massiv ob'ektov, kotorye budut davat' potomstvo
 %  OUTPUT
-% 
+% objects - ves' massiv ob'ektov, s zamenennymi mozgami
 
 kol_parents=length(parents);
 kol_children=length(find([objects.type]==parents(1).type));
@@ -17,13 +18,10 @@ k_v=2*kol_children/kol_parents; % koefficient vosproizvedeniya potomstva
 if mod(k_v,1)
     %neceloe, choto nado delat'
 else
-    k_v=floor(k_v);
+    %k_v=floor(k_v);
     %celoe chislo potomkov
     
 end;
-
-
-
 
 for k=1:2:kol_parents
     for m=1:k_v

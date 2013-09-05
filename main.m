@@ -1,9 +1,9 @@
 clear all; %home;
 %% NEUROMACHINE 
-% Opisanie programmy
-% opisanie peremennyh
-% Bazovye peremennye:
-kol_obj_1=1; %kolichestvo ob'ektov 1 tipa
+%% ABSTRACT
+% Genetic algoritm + neural networks
+%% Define input parameters:
+kol_obj_1=10; % kolichestvo ob'ektov 1 tipa
 kol_obj_2=80; %kolichestvo ob'ektov vtorogo tipa
 
 nn_struct=[2]; %struktura nn. Kolichestvo neironov v kajdom sloe.
@@ -11,8 +11,8 @@ kol_gen=40; %kolichestvo pokolenii
 kol_survived_2=round(kol_obj_2*0.25);
 kol_frm=100; %kolichestvo kadrov rascheta (freimov) v kajdom turnire
 
-hght=400;% vysota igrovogo polya
-wdth=400;% shirina igrovogo polya
+hght=200;% vysota igrovogo polya
+wdth=200;% shirina igrovogo polya
 
 str_logcat='log/';
 % Bazovye raschetnye peremennye:
@@ -24,23 +24,21 @@ kol_obj=kol_obj_1+kol_obj_2; % obwee kolichestvo ob'ektov
 
 % sozdanie i opisanie struktury "obj"
 obj_struct=struct('num',0,'type',1,'xy',[0;0],'K',0,'vel',2,'acc',0,'U',0,'E',0,'scr',0,'brn_struct',nn_struct,'brn',[]);%zeros(1,nn_length));
-% type --- tip   
-%   1-celi
-%   2-upravlyautsya neiroset'u agenty
-%
-% XY --- koordinaty, pix
-% K --- azimuth kursa, rad
-% vel --- lineinaya skorost', pix/fr
-% acc --- lineinoe uskorenie
-% U --- uglovaya skorost', rad/fr
-% E --- uglovoe uskorenie
-%
-% scr --- kolichestvo ochkov
-%
-% brn_struct - struktura neiroseti. Kolichestvo neironov v kajdom sloe
-% brn --- mozg.
+%% Fields of structure:
+% # type --- tip   
+%  * 1-celi
+%  * 2-upravlyautsya neiroset'u agenty
+% # XY --- koordinaty, pix
+% # K --- azimuth kursa, rad
+% # vel --- lineinaya skorost', pix/fr
+% # acc --- lineinoe uskorenie
+% # U --- uglovaya skorost', rad/fr
+% # E --- uglovoe uskorenie
+% # scr --- kolichestvo ochkov
+% # brn_struct --- struktura neiroseti. Kolichestvo neironov v kajdom sloe
+% # brn --- mozg.
 
-%sozdanie massiva ob'ektov
+%% sozdanie massiva ob'ektov
 obj(1:kol_obj)=deal(obj_struct);
 for num_obj=1:kol_obj_1
     obj(num_obj).type=1;
@@ -56,9 +54,7 @@ end;
 tic;
 for num_gen=1:kol_gen
     disp(['Pokolenie ' num2str(num_gen)]);
-    %% Turnir
-   
-    
+    %%% Turnir
     
     %% Pervichnoe formirovanie sceny
     pole=zeros(hght,wdth);
@@ -73,6 +69,7 @@ for num_gen=1:kol_gen
     %zapis' v log
      fl_turnirlog=fopen([str_logcat num2str(num_gen,'%3.0u') '_genlog.bn'],'w');
      fwrite(fl_turnirlog,size(pole),'uint16');
+     fwrite(fl_turnirlog,kol_obj_1,'uint16');
      
     %% Pokadrovyi progon
     for num_frm=1:kol_frm
@@ -159,11 +156,4 @@ for num_gen=1:kol_gen
     
     %% Skrewivanie
     [obj] = procreation(obj,obj_survived);
-   
-%     m=1;
-%     for k=(kol_obj_1+1):kol_obj
-%         obj(k).brn=crossing(obj_survived(2*floor(m)-1).brn,obj_survived(2*floor(m)).brn);
-%         m=m+(kol_survived_2/kol_obj_2)/2;
-%     end;
-%     fclose(fl_turnirlog);
 end;
