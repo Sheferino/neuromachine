@@ -1,12 +1,12 @@
 function [ winners ] = TournamentTable( objects,kol_winners )
-% DESCRIPTION
+%% DESCRIPTION
 % Vozvrawaet pobeditelei po kolichestvu ochkov (obj.scr)
-% SYNTAX
+%% SYNTAX
 % [winners] = TournamentTable( objects,kol_winners )
-% INPUT
+%% INPUT
 % objects-ob'ekty sorevnovanii. Massiv struktur tipa obj
 % kol_winners - kolichestvo pobeditelei.
-% OUTPUT
+%% OUTPUT
 % winners - pobediteli. Massiv struktur tipa obj.
 
 %dobavit' proverki na korrektnost'

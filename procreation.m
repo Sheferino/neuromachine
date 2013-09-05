@@ -1,12 +1,12 @@
 function [ objects ] = procreation(objects,parents )
-%  DESCRIPTION
+%%  DESCRIPTION
 % Vozvrawaet rezul'tat skrewivaniya i mutacii.
-%  SYNTAX
+%%  SYNTAX
 % [ objects ] = procreation(objects,parents )
-%  INPUT
+%% INPUT
 % objects - ves' massiv ob'ektov
 % parents - massiv ob'ektov, kotorye budut davat' potomstvo
-%  OUTPUT
+%% OUTPUT
 % objects - ves' massiv ob'ektov, s zamenennymi mozgami
 
 kol_parents=length(parents);

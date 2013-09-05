@@ -1,23 +1,24 @@
 %% Chtenie logov
-% Vizualizaciya i formirovanie video
+% Vizualizaciya raunda i formirovanie video.
 
-%podgotovka classa video
-vidObj = VideoWriter('neuromachine.avi','Uncompressed AVI');
-open(vidObj);
-
-%otkrytie logov i chtenie slujebnoi informacii
+%% Otkrytie logov i chtenie slujebnoi informacii
 fid=fopen('log/10_genlog.bn','r');
 pole_size=fread(fid,[1 2],'uint16');
 kol_obj_1=fread(fid,1,'uint16');
 height=pole_size(1);
 width=pole_size(2);
 
-%podgotovka grafiki
+%% Podgotovka classa video
+vidObj = VideoWriter('neuromachine.avi','Uncompressed AVI');
+open(vidObj);
+
+%% Podgotovka grafiki
 figure('MenuBar','none','Resize','off','Position',[50 50 width height]);
 axes('ActivePositionProperty','position','Units','pixels','Position',[0 0 width height]);
 clmap=[0  0 0; 1 1 1; 1 0 0];
 colormap(clmap);
 
+%% Formirovanie izobrajeniya
 k=1;
 while ~feof(fid)
     pl=sparse(fread(fid,[height width],'uint8'));
@@ -27,6 +28,8 @@ while ~feof(fid)
     title(num2str(k));
     k=k+1;
 end;
+
+%% Zakrytie logov, zapis' video
 fclose(fid);
 close(vidObj); %sohranenie video
 movie(gcf,F,10); %proigryvanie zahvachennyh kadrov

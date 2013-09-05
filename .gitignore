@@ -163,4 +163,10 @@ pip-log.txt
 .DS_Store
 
 #matlab project
+*.asv
 *.prj
+html/
+
+#neuromachine log-files
+log/
+*.avi
